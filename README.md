@@ -39,13 +39,13 @@ ya. Godspeed.
     use WWW::Cachet::Const qw/ :all :component_status :incident_status :calc_type /;
     
     my $cachet = WWW::Cachet->new(
-    api_url   => "http://cachet.example.com/api/v1",
-    api_token => "rRpHYVhsNnG12X3N4ufr",
-    # Optional basic HTTP authentication
-    basic_auth => {
-      user     => "cachet",
-      password => "test"
-    }
+      api_url   => "http://cachet.example.com/api/v1",
+      api_token => "rRpHYVhsNnG12X3N4ufr",
+      # Optional basic HTTP authentication
+      basic_auth => {
+        user     => "cachet",
+        password => "test"
+      }
     );
     
     # List Components
