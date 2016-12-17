@@ -62,16 +62,32 @@ has notify => (
   default  => 0
 );
 
-has created_at => (
-  is       => 'rw',
-);
-
 has template => (
   is       => 'rw',
 );
 
 has vars => (
   is       => 'rw',
+);
+
+has scheduled_at => (
+  is => 'rw'
+);
+
+has created_at => (
+  is => 'rw'
+);
+
+has updated_at => (
+  is => 'rw'
+);
+
+has deleted_at => (
+  is => 'rw'
+);
+
+has human_status => (
+  is => 'rw'
 );
 
 1;

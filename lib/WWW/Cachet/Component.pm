@@ -67,6 +67,18 @@ has enabled => (
   },
 );
 
+has created_at => (
+  is => 'rw'
+);
+
+has updated_at => (
+  is => 'rw'
+);
+
+has deleted_at => (
+  is => 'rw'
+);
+
 1;
 __END__
 =head1 NAME
