@@ -47,4 +47,45 @@ our %EXPORT_TAGS = (
 );
 
 1;
+__END__
+=head1 NAME
 
+WWW::Cachet::Status - Import constants that map to Cachet API status codes
+
+=head1 SYNOPSIS
+
+  use WWW::Cachet::Status qw/ :component_status /;
+  # Now we have access to the constants
+    STATUS_OPERATIONAL
+    STATUS_PERFORMANCE_ISSUES
+    STATUS_PARTIAL_OUTAGE
+    STATUS_MAJOR_OUTAGE
+
+  use WWW::Cachet::Status qw/ :incident_status /;
+  # Now we have access to the constants:
+    STATUS_SCHEDULED
+    STATUS_INVESTIGATING
+    STATUS_IDENTIFIED
+    STATUS_WATCHING
+    STATUS_FIXED
+
+  # Or import them all with
+  use WWW::Cachet::Status qw/ :component_status :incident_status /;
+
+=head1 SEE ALSO
+
+L<WWW::Cachet>
+
+=head1 AUTHOR
+
+Jarrod Linahan, E<lt>jarrod@linahan.id.au<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Jarrod Linahan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.20.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
