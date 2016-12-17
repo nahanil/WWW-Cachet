@@ -31,6 +31,20 @@ has status => (
   required => TRUE
 );
 
+has status_name => (
+  is => 'rw'
+);
+
+has tags => (
+  is => 'rw',
+  isa => sub {
+    if ($_) {
+      confess "Expected 'tags' to be an array" unless (ref $_[0]  eq "HASH");
+    }
+  },
+  default => undef
+);
+
 has link => (
   is       => 'rw',
 );
