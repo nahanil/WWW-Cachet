@@ -375,6 +375,15 @@ sub _handle_response {
 
 1;
 __END__
+=head1 TODO
+
+API Calls that need to be implemented
+
+  /components/groups.*
+  /metrics.*
+  /subscribers.*
+  /actions.*
+
 =head1 AUTHOR
 
 Jarrod Linahan <jarrod@linahan.id.au>
