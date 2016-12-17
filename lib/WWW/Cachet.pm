@@ -293,6 +293,100 @@ sub deleteIncident {
 }
 
 
+=head2 Metrics
+
+=head3 getMetrics()
+
+  Returns a list of WWW::Cachet::Metric from the Cachet API
+
+=cut
+sub getMetrics {
+  my ($self, $id) = @_;
+  
+  my $response = $self->_get("/metrics");
+  if ($response->ok) {
+    my @metrics = ();
+    for my $c (@{$response->data}) {
+      use Data::Dumper;
+      print Dumper($c);
+      push @metrics, WWW::Cachet::Metric->new( $c );
+    }
+    return \@metrics
+  }
+  return undef;
+}
+
+=head3 getMetric($id)
+
+  Return a single WWW::Cachet::Metric from the Cachet API
+
+=cut
+sub getMetric {
+  my ($self, $id) = @_;
+  
+  my $response = $self->_get("/metrics/$id");
+  if ($response->ok) {
+    return WWW::Cachet::Metric->new( $response->data );
+  }
+  return undef;
+}
+
+=head3 addMetric($data)
+
+  Requires valid authentication
+  Create a new component
+
+=cut
+sub addMetric {
+  my ($self, $metric) = @_;
+
+  if (ref $metric eq "WWW::Cachet::Metric") {
+    $metric = $metric->toHash();
+  }
+
+  my $response = $self->_post("/metrics", $metric);
+  if ($response->ok) {
+    return WWW::Cachet::Metric->new($response->data);
+  }
+
+  return undef;
+}
+
+=head3 updateMetric($id, $data)
+
+  Requires valid authentication
+  Update a metric
+
+=cut
+sub updateMetric {
+   my ($self, $id, $metric) = @_;
+
+  if (ref $metric eq "WWW::Cachet::Metric") {
+    $metric = $metric->toHash();
+  }
+
+  my $response = $self->_put("/metrics/$id", $metric);
+  if ($response->ok) {
+    return WWW::Cachet::Metric->new($response->data);
+  }
+
+  return undef;
+}
+
+
+=head3 deleteMetric($id)
+
+  Requires valid authentication
+  Delete a metric
+
+=cut
+sub deleteMetric {
+  my ($self, $id) = @_;
+  
+  my $response = $self->_delete("/metrics/$id");
+  return $response->ok;
+}
+
 ##
 #
 # BEGIN secret undocumented internals. Woo
@@ -380,7 +474,7 @@ __END__
 API Calls that need to be implemented
 
   /components/groups.*
-  /metrics.*
+  /metrics/:id/points.*
   /subscribers.*
   /actions.*
 
