@@ -3,22 +3,37 @@ our $VERSION = '0.01';
 
 =head1 NAME
 
-WWW::Cachet - Perl extension for blah blah blah
+WWW::Cachet - Perl extension to interface with Cachet L<http://cachethq.io/>
 
 =head1 SYNOPSIS
 
   use Data::Dumper;
   use WWW::Cachet;
+  # Import some constants to use later
+  use WWW::Cachet::Const qw/ :all :component_status :incident_status :calc_type /;
 
   my $cachet = WWW::Cachet->new(
     api_url   => "http://cachet.example.com/api/v1",
     api_token => "rRpHYVhsNnG12X3N4ufr"
   );
 
+  # List Components
   my $component = $cachet->getComponent(1);
   die $cachet->error unless($component);
 
-  print Dumper $component;
+  # Create a component
+  my $new_component = $cachet->addComponent({
+    name => "New Component",
+    status => STATUS_OPERATIONAL
+  });
+
+  # Update an existing component
+  $new_component->status(STATUS_PARTIAL_OUTAGE);
+  my $updated_component = $cachet->updateComponent($new_component);
+  # OR
+  my $id = 3;
+  my %update = ( status => STATUS_PARTIAL_OUTAGE );
+  my $updated_component = $cachet->updateComponent($id, \%update);
 
 =head1 DESCRIPTION
 
@@ -168,7 +183,12 @@ sub addComponent {
 
 =cut
 sub updateComponent {
-   my ($self, $id, $component) = @_;
+  my ($self, $id, $component) = @_;
+
+  if (ref $id eq "WWW::Cachet::Component" && $id->id) {
+    $component = $id;
+    $id = $component->id;
+  }
 
   if (ref $component eq "WWW::Cachet::Component") {
     $component = $component->toHash();
@@ -193,6 +213,103 @@ sub deleteComponent {
   my ($self, $id) = @_;
   
   my $response = $self->_delete("/components/$id");
+  return $response->ok;
+}
+
+=head2 Component Groups
+
+=head3 getComponentGroups()
+
+  Returns a list of WWW::Cachet::ComponentGroup from the Cachet API
+
+=cut
+sub getComponentGroups {
+  my ($self, $id) = @_;
+  
+  my $response = $self->_get("/components/groups");
+  if ($response->ok) {
+    my @groups = ();
+    for my $c (@{$response->data}) {
+      push @groups, WWW::Cachet::ComponentGroup->new( $c );
+    }
+    return \@groups
+  }
+  return undef;
+}
+
+=head3 getComponentGroup($id)
+
+  Return a single WWW::Cachet::ComponentGroup from the Cachet API
+
+=cut
+sub getComponentGroup {
+  my ($self, $id) = @_;
+  
+  my $response = $self->_get("/components/groups/$id");
+  if ($response->ok) {
+    return WWW::Cachet::ComponentGroup->new( $response->data );
+  }
+  return undef;
+}
+
+=head3 addComponentGroup($data)
+
+  Requires valid authentication
+  Create a new component group
+
+=cut
+sub addComponentGroup {
+  my ($self, $group) = @_;
+
+  if (ref $group eq "WWW::Cachet::ComponentGroup") {
+    $group = $group->toHash();
+  }
+
+  my $response = $self->_post("/components/groups", $group);
+  if ($response->ok) {
+    return WWW::Cachet::ComponentGroup->new($response->data);
+  }
+
+  return undef;
+}
+
+=head3 updateComponentGroup($id, $data)
+
+  Requires valid authentication
+  Update a component group
+
+=cut
+sub updateComponentGroup {
+  my ($self, $id, $group) = @_;
+
+  if (ref $id eq "WWW::Cachet::ComponentGroup" && $id->id) {
+    $group = $id;
+    $id = $group->id;
+  }
+
+  if (ref $group eq "WWW::Cachet::ComponentGroup") {
+    $group = $group->toHash();
+  }
+
+  my $response = $self->_put("/components/groups/$id", $group);
+  if ($response->ok) {
+    return WWW::Cachet::ComponentGroup->new($response->data);
+  }
+
+  return undef;
+}
+
+
+=head3 deleteComponentGroup($id)
+
+  Requires valid authentication
+  Delete a component group
+
+=cut
+sub deleteComponentGroup {
+  my ($self, $id) = @_;
+  
+  my $response = $self->_delete("/components/groups/$id");
   return $response->ok;
 }
 
@@ -263,6 +380,11 @@ sub addIncident {
 =cut
 sub updateIncident {
    my ($self, $id, $incident) = @_;
+
+  if (ref $id eq "WWW::Cachet::Incident" && $id->id) {
+    $incident = $id;
+    $id = $incident->id;
+  }
 
   if (ref $incident eq "WWW::Cachet::Incident") {
     $incident = $incident->toHash();
@@ -361,6 +483,11 @@ sub addMetric {
 sub updateMetric {
    my ($self, $id, $metric) = @_;
 
+  if (ref $id eq "WWW::Cachet::Metric" && $id->id) {
+    $metric = $id;
+    $id = $metric->id;
+  }
+
   if (ref $metric eq "WWW::Cachet::Metric") {
     $metric = $metric->toHash();
   }
@@ -384,6 +511,88 @@ sub deleteMetric {
   my ($self, $id) = @_;
   
   my $response = $self->_delete("/metrics/$id");
+  return $response->ok;
+}
+
+=head2 Metric Points
+
+=head3 getMetricPoints($metric)
+
+  Returns a list of WWW::Cachet::MetricPoints from the Cachet API
+
+=cut
+sub getMetricPoints {
+  my ($self, $id) = @_;
+
+  if (ref $id eq "WWW::Cachet::Metric") {
+    $id = $id->id;
+  }
+  
+  my $response = $self->_get("/metrics/$id/points");
+  if ($response->ok) {
+    my @metrics = ();
+    for my $c (@{$response->data}) {
+      print Dumper($c);
+      push @metrics, WWW::Cachet::MetricPoint->new( $c );
+    }
+    return \@metrics
+  }
+  return undef;
+}
+
+=head3 addMetricPoint($metric_id, $point_data)
+   addMetricPoint($metric, $point)
+   addMetricPoint($point)
+
+  Requires valid authentication
+  Create a new component
+
+=cut
+sub addMetricPoint {
+  my ($self, $metric, $point) = @_;
+
+  if (ref $metric eq "WWW::Cachet::Metric") {
+    $metric = $metric->id;
+  } elsif (ref $metric eq "WWW::Cachet::MetricPoint" && $metric->metric_id) {
+    $point = $metric;
+    $metric = $point->metric_id;
+  }
+
+  if (ref $point eq "WWW::Cachet::MetricPoint") {
+    $point = $point->toHash();
+  }
+
+  my $response = $self->_post("/metrics/$metric/points", $point);
+  if ($response->ok) {
+    return WWW::Cachet::Metric->new($response->data);
+  }
+
+  return undef;
+}
+
+=head3 deleteMetric($metric_id, $point_$id)
+   deleteMetric($metric, $point)
+   deleteMetric($point) # Provided point has metric_id set
+
+  Requires valid authentication
+  Delete a metric
+
+=cut
+sub deleteMetricPoint {
+  my ($self, $metric, $point) = @_;
+
+  if (ref $metric eq "WWW::Cachet::Metric") {
+    $metric = $metric->id;
+  } elsif (ref $metric eq "WWW::Cachet::MetricPoint" && $metric->metric_id) {
+    $point = $metric;
+    $metric = $point->metric_id;
+  }
+
+  if (ref $point eq "WWW::Cachet::MetricPoint") {
+    $point = $point->id;
+  }
+  
+  my $response = $self->_delete("/metrics/$metric/points/$point");
   return $response->ok;
 }
 
@@ -473,8 +682,6 @@ __END__
 
 API Calls that need to be implemented
 
-  /components/groups.*
-  /metrics/:id/points.*
   /subscribers.*
   /actions.*
 
