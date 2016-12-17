@@ -59,7 +59,7 @@ has notify => (
   isa      => sub {
     confess "'notify' should be 1 or 0" unless ($_[0] =~ /^[01]$/);
   },
-  required => TRUE
+  default  => 0
 );
 
 has created_at => (
