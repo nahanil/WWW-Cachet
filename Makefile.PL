@@ -5,7 +5,12 @@ use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME              => 'WWW::Cachet',
     VERSION_FROM      => 'lib/WWW/Cachet.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
-    PREREQ_PM         => {}, # e.g., Module::Name => 1.1
+    PREREQ_PM         => {
+      'Moo' => '2.003000',
+      'LWP::UserAgent' => '0',
+      'LWP::Protocol::https' => '0',
+      'JSON' => '0',
+    },
     ABSTRACT_FROM     => 'lib/WWW/Cachet.pm', # retrieve abstract from module
     AUTHOR            => 'Jarrod Linahan <jarrod@linahan.id.au>',
     LICENSE           => 'perl',
