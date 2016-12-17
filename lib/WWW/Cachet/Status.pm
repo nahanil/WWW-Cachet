@@ -11,6 +11,7 @@ use constant STATUS_PARTIAL_OUTAGE     => 3;
 use constant STATUS_MAJOR_OUTAGE       => 4;
 
 # Incident Statuses
+use constant STATUS_SCHEDULED     => 0;
 use constant STATUS_INVESTIGATING => 1;
 use constant STATUS_IDENTIFIED    => 2;
 use constant STATUS_WATCHING      => 3;
@@ -37,6 +38,7 @@ our %EXPORT_TAGS = (
   ],
 
   incident_status => [
+    'STATUS_SCHEDULED',
     'STATUS_INVESTIGATING',
     'STATUS_IDENTIFIED',
     'STATUS_WATCHING',
