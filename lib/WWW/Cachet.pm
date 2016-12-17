@@ -577,15 +577,15 @@ sub addMetricPoint {
 
   my $response = $self->_post("/metrics/$metric/points", $point);
   if ($response->ok) {
-    return WWW::Cachet::Metric->new($response->data);
+    return WWW::Cachet::MetricPoint->new($response->data);
   }
 
   return undef;
 }
 
-=head3 deleteMetric($metric_id, $point_$id)
-   deleteMetric($metric, $point)
-   deleteMetric($point) # Provided point has metric_id set
+=head3 deleteMetricPoint($metric_id, $point_id)
+   deleteMetricPoint($metric, $point)
+   deleteMetricPoint($point) # Provided point has metric_id set
 
   Requires valid authentication
   Delete a metric
@@ -608,6 +608,71 @@ sub deleteMetricPoint {
   my $response = $self->_delete("/metrics/$metric/points/$point");
   return $response->ok;
 }
+
+
+=head2 Subscribers
+
+=head3 getSubscribers()
+
+  Returns a list of WWW::Cachet::Subscribers from the Cachet API
+
+=cut
+sub getSubscribers {
+  my ($self) = @_;
+
+  my $response = $self->_get("/subscribers");
+  if ($response->ok) {
+    my @metrics = ();
+    for my $c (@{$response->data}) {
+      push @metrics, WWW::Cachet::Subscriber->new( $c );
+    }
+    return \@metrics
+  }
+  return undef;
+}
+
+=head3 addSubscriber($data)
+   addSubscriber(WWW::Cachet::Subscriber)
+
+  Requires valid authentication
+  Create a new subscriber
+
+  TODO: Can't currently set component alerts to subscribe to (always ALL)
+
+=cut
+sub addSubscriber {
+  my ($self, $data) = @_;
+
+  if (ref $data eq "WWW::Cachet::Subscriber") {
+    $data = $data->toHash();
+  }
+
+  my $response = $self->_post("/subscribers", $data);
+  if ($response->ok) {
+    return WWW::Cachet::Subscriber->new($response->data);
+  }
+
+  return undef;
+}
+
+=head3 deleteSubscriber($subscriber_id)
+   deleteSubscriber(WWW::Cachet::Subscriber)
+
+  Requires valid authentication
+  Delete a metric
+
+=cut
+sub deleteSubscriber {
+  my ($self, $subscriber) = @_;
+
+  if (ref $subscriber eq "WWW::Cachet::Subscriber") {
+    $subscriber = $subscriber->id;
+  }
+  
+  my $response = $self->_delete("/subscribers/$subscriber");
+  return $response->ok;
+}
+
 
 ##
 #
@@ -694,7 +759,6 @@ sub _handle_response {
   return $response;
 }
 
-
 1;
 __END__
 =head1 TODO
@@ -702,6 +766,7 @@ __END__
 - API Calls that need to be implemented
 
   /subscribers.*
+  /incidents/:incident/updates.*
   /actions.*
 
 =head1 AUTHOR
