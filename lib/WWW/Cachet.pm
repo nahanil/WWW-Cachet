@@ -327,8 +327,6 @@ sub getIncidents {
   if ($response->ok) {
     my @incidents = ();
     for my $c (@{$response->data}) {
-      use Data::Dumper;
-      print Dumper($c);
       push @incidents, WWW::Cachet::Incident->new( $c );
     }
     return \@incidents
@@ -429,8 +427,6 @@ sub getMetrics {
   if ($response->ok) {
     my @metrics = ();
     for my $c (@{$response->data}) {
-      use Data::Dumper;
-      print Dumper($c);
       push @metrics, WWW::Cachet::Metric->new( $c );
     }
     return \@metrics
@@ -532,7 +528,6 @@ sub getMetricPoints {
   if ($response->ok) {
     my @metrics = ();
     for my $c (@{$response->data}) {
-      print Dumper($c);
       push @metrics, WWW::Cachet::MetricPoint->new( $c );
     }
     return \@metrics
@@ -680,10 +675,15 @@ sub _handle_response {
 __END__
 =head1 TODO
 
-API Calls that need to be implemented
+- API Calls that need to be implemented
 
   /subscribers.*
   /actions.*
+
+- Should probably add Basic Auth support.
+  - When creating a WWW::Cachet object pass in the basic auth user/pass
+  - In WWW::Cachet::BUILD set $self->_ua->default_header("X-Cachet-Token" => $self->api_token);
+    That is, unless LWP::UA has a better way of doing this..
 
 =head1 AUTHOR
 
