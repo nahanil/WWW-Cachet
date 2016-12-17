@@ -11,6 +11,7 @@ BEGIN {
 };
 
 #########################
+# Set up a mock LWP::UserAgent whynots
 my $ua = Test::LWP::UserAgent->new;
 $ua->map_response(
   qr{example.com/components},
