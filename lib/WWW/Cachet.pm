@@ -14,7 +14,12 @@ WWW::Cachet - Perl extension to interface with Cachet L<http://cachethq.io/>
 
   my $cachet = WWW::Cachet->new(
     api_url   => "http://cachet.example.com/api/v1",
-    api_token => "rRpHYVhsNnG12X3N4ufr"
+    api_token => "rRpHYVhsNnG12X3N4ufr",
+    # Optional basic HTTP authentication
+    basic_auth => {
+      user     => "cachet",
+      password => "test"
+    }
   );
 
   # List Components
@@ -37,11 +42,10 @@ WWW::Cachet - Perl extension to interface with Cachet L<http://cachethq.io/>
 
 =head1 DESCRIPTION
 
-Stub documentation for WWW::Cachet, created by h2xs. It looks like the
-author of the extension was negligent enough to leave the stub
-unedited.
-
-Blah blah blah.
+Simple interface to Cachet from Perl. Available methods are documented here in POD,
+required/available parameters can be found in subclasses of WWW::Cachet::Object.
+Alternatively you can check the API docs at L<https://docs.cachethq.io/reference> as
+arguments are 1 for 1 translated to function parameters.
 
 =head1 METHODS
 =cut
@@ -51,12 +55,12 @@ use constant TRUE  => 1;
 use constant FALSE => 0;
 
 use Moo;
+use Carp;
 use JSON;
 use LWP::UserAgent;
 use HTTP::Request::Common qw/ GET POST PUT DELETE /;
 
 use WWW::Cachet::Response;
-
 use WWW::Cachet::Component;
 use WWW::Cachet::Incident;
 
@@ -68,6 +72,10 @@ has api_url => (
 has api_token => (
   is => 'rw',
   required => TRUE,
+);
+
+has basic_auth => (
+  is => 'rw',
 );
 
 has _ua => (
@@ -87,6 +95,16 @@ has error => (
 
 sub BUILD {
   my ($self, $args) = @_;
+
+  if (defined $args->{basic_auth}) {
+    if (ref $args->{basic_auth} ne "HASH") {
+      confess "WWW::Cachet basic_auth parameter should be a hashref";
+    }
+
+    if (!defined $args->{basic_auth}->{user} || !defined $args->{basic_auth}->{password}) {
+      confess "WWW::Cachet basic_auth hash should contain `user` and `password`";
+    }
+  }
 
   $self->_ua( defined $args->{_ua} ? $args->{_ua} : new LWP::UserAgent);
   $self->_ua->default_header("X-Cachet-Token" => $self->api_token);
@@ -599,33 +617,39 @@ sub deleteMetricPoint {
 sub _get {
   my ($self, $path) = @_;
   my $url = $self->api_url . $path;
-  my $res =$self->_ua->request(GET $url);
-  return $self->_handle_response($res);
+  my $request = GET $url;
+  return $self->_handle_response($request);
 }
 
 sub _post {
   my ($self, $path, $params) = @_;
   my $url = $self->api_url . $path;
-  my $res = $self->_ua->request(POST $url, $params);
-  return $self->_handle_response($res);
+  my $request = POST $url, $params;
+  return $self->_handle_response($request);
 }
 
 sub _put {
   my ($self, $path, $params) = @_;
   my $url = $self->api_url . $path;
-  my $res = $self->_ua->request(PUT $url, $params);
-  return $self->_handle_response($res);
+  my $request = PUT $url, $params;
+  return $self->_handle_response($request);
 }
 
 sub _delete {
   my ($self, $path) = @_;
   my $url = $self->api_url . $path;
-  my $res =$self->_ua->request(DELETE $url);
-  return $self->_handle_response($res);
+  my $request = DELETE $url;
+  return $self->_handle_response($request);
 }
 
 sub _handle_response {
-  my ($self, $res) = @_;
+  my ($self, $req) = @_;
+
+  if ($self->basic_auth) {
+    $req->authorization_basic( $self->basic_auth->{user}, $self->basic_auth->{password} );
+  }
+
+  my $res = $self->_ua->request($req);
 
   my $response;
   if ($res->is_success) {
@@ -679,11 +703,6 @@ __END__
 
   /subscribers.*
   /actions.*
-
-- Should probably add Basic Auth support.
-  - When creating a WWW::Cachet object pass in the basic auth user/pass
-  - In WWW::Cachet::BUILD set $self->_ua->default_header("X-Cachet-Token" => $self->api_token);
-    That is, unless LWP::UA has a better way of doing this..
 
 =head1 AUTHOR
 
