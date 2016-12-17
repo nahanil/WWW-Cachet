@@ -1,0 +1,6 @@
+Revision history for Perl extension WWW::Cachet.
+
+0.01  Sat Dec 17 21:41:52 2016
+	- original version; created by h2xs 1.23 with options
+		-AX WWW::Cachet
+
