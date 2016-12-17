@@ -73,19 +73,32 @@ sub BUILD {
   $self->{ua}->default_header("X-Cachet-Token" => $self->api_token);
 }
 
-=head3 TODO ping()
+=head3 ping()
 
   Test that the API is responding to your requests
 
 =cut
-sub ping {}
+sub ping {
+  my ($self) = @_;
+  
+  my $response = $self->_get("/ping");  
+  return $response->ok;
+}
 
-=head3 TODO getVersion()
+=head3 getVersion()
 
   Get Cachet version from API
 
 =cut
-sub getVersion {}
+sub getVersion {
+  my ($self) = @_;
+  
+  my $response = $self->_get("/version");
+  if ($response->ok) {
+    return $response->data;
+  }
+  return undef;
+}
 
 =head2 Components
 
@@ -138,7 +151,7 @@ sub addComponent {
 
   my $response = $self->_post("/components", $component);
   if ($response->ok) {
-    return $response->data;
+    return WWW::Cachet::Component->new($response->data);
   }
 
   return undef;
@@ -159,7 +172,7 @@ sub updateComponent {
 
   my $response = $self->_put("/components/$id", $component);
   if ($response->ok) {
-    return $response->data;
+    return WWW::Cachet::Component->new($response->data);
   }
 
   return undef;
@@ -179,6 +192,108 @@ sub deleteComponent {
   return $response->ok;
 }
 
+=head2 Incidents
+
+=head3 getIncidents()
+
+  Returns a list of WWW::Cachet::Incident from the Cachet API
+
+=cut
+sub getIncidents {
+  my ($self, $id) = @_;
+  
+  my $response = $self->_get("/incidents");
+  if ($response->ok) {
+    my @incidents = ();
+    for my $c (@{$response->data}) {
+      use Data::Dumper;
+      print Dumper($c);
+      push @incidents, WWW::Cachet::Incident->new( $c );
+    }
+    return \@incidents
+  }
+  return undef;
+}
+
+=head3 getIncident($id)
+
+  Return a single WWW::Cachet::Incident from the Cachet API
+
+=cut
+sub getIncident {
+  my ($self, $id) = @_;
+  
+  my $response = $self->_get("/incidents/$id");
+  if ($response->ok) {
+    return WWW::Cachet::Incident->new( $response->data );
+  }
+  return undef;
+}
+
+=head3 addIncident($data)
+
+  Requires valid authentication
+  Create a new component
+
+=cut
+sub addIncident {
+  my ($self, $incident) = @_;
+
+  if (ref $incident eq "WWW::Cachet::Incident") {
+    $incident = $incident->toHash();
+  }
+
+  my $response = $self->_post("/incidents", $incident);
+  if ($response->ok) {
+    return WWW::Cachet::Incident->new($response->data);
+  }
+
+  return undef;
+}
+
+=head3 updateIncident($id, $data)
+
+  Requires valid authentication
+  Update a incident
+
+=cut
+sub updateIncident {
+   my ($self, $id, $incident) = @_;
+
+  if (ref $incident eq "WWW::Cachet::Incident") {
+    $incident = $incident->toHash();
+    undef $incident->{created_at};
+    undef $incident->{id};
+  }
+
+  my $response = $self->_put("/incidents/$id", $incident);
+  if ($response->ok) {
+    return WWW::Cachet::Incident->new($response->data);
+  }
+
+  return undef;
+}
+
+
+=head3 deleteIncident($id)
+
+  Requires valid authentication
+  Delete a incident
+
+=cut
+sub deleteIncident {
+  my ($self, $id) = @_;
+  
+  my $response = $self->_delete("/incidents/$id");
+  return $response->ok;
+}
+
+
+##
+#
+# BEGIN secret undocumented internals. Woo
+#
+##
 sub _get {
   my ($self, $path) = @_;
   my $url = $self->api_url . $path;
