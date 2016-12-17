@@ -4,6 +4,7 @@ use constant true  => 1;
 use constant false => 0;
 
 use Moo;
+extends 'WWW::Cachet::Object';
 use Carp qw/ confess /;
 
 has id => (
