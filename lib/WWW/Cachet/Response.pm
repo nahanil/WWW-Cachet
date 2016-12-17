@@ -1,14 +1,14 @@
 package WWW::Cachet::Response;
 
-use constant true  => 1;
-use constant false => 0;
+use constant TRUE  => 1;
+use constant FALSE => 0;
 
 use Moo;
 use LWP::UserAgent;
 
 has ok => (
   is => 'rw',
-  required => true,
+  required => TRUE,
 );
 
 has message => (

@@ -1,7 +1,7 @@
 package WWW::Cachet::Object;
 
-use constant true  => 1;
-use constant false => 0;
+use constant TRUE  => 1;
+use constant FALSE => 0;
 
 use Moo;
 use JSON;

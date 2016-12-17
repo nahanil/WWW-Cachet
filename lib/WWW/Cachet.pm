@@ -32,8 +32,8 @@ Blah blah blah.
 =cut
 
 
-use constant true  => 1;
-use constant false => 0;
+use constant TRUE  => 1;
+use constant FALSE => 0;
 
 use Moo;
 use JSON;
@@ -47,12 +47,12 @@ use WWW::Cachet::Incident;
 
 has api_url => (
   is => 'rw',
-  required => true,
+  required => TRUE,
 );
 
 has api_token => (
   is => 'rw',
-  required => true,
+  required => TRUE,
 );
 
 =head2 General
@@ -218,7 +218,7 @@ sub _handle_response {
     }
 
     $response = WWW::Cachet::Response->new(
-      ok => true,
+      ok => TRUE,
       data => $json ? $json->{data} : undef
     );
 
@@ -235,19 +235,19 @@ sub _handle_response {
     } else { push @errors, "Bad Request"; }
     
     $self->error( join("; ", @errors) );
-    $response = WWW::Cachet::Response->new( ok => false, message => $self->error );
+    $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
 
   } elsif ($res->code == 401) {
     $self->error("API Authentication is required and has failed");
-    $response = WWW::Cachet::Response->new( ok => false, message => $self->error );
+    $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
 
   } elsif ($res->code == 404) {
     $self->error("Requested resource not found");
-    $response = WWW::Cachet::Response->new( ok => false, message => $self->error );
+    $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
 
   } else {
     $self->error("Request failed: ". $res->content);
-    $response = WWW::Cachet::Response->new( ok => false, message => $self->error );
+    $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
   }
 
   return $response;

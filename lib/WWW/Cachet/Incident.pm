@@ -1,7 +1,7 @@
 package WWW::Cachet::Incident;
 
-use constant true  => 1;
-use constant false => 0;
+use constant TRUE  => 1;
+use constant FALSE => 0;
 
 use Moo;
 extends 'WWW::Cachet::Object';
@@ -16,12 +16,12 @@ has id => (
 
 has name => (
   is       => 'rw',
-  required => true
+  required => TRUE
 );
 
 has message => (
   is       => 'rw',
-  required => true
+  required => TRUE
 );
 
 has status => (
@@ -29,7 +29,7 @@ has status => (
   isa      => sub {
     confess "Invalid incident status" unless ($_[0] =~ /^[0-4]$/); 
   },
-  required => true
+  required => TRUE
 );
 
 has visible => (
@@ -37,7 +37,7 @@ has visible => (
   isa      => sub {
     confess "'visible' should be 1 or 0" unless ($_[0] =~ /^[01]$/);
   },
-  required => true
+  required => TRUE
 );
 
 has component_id => (
@@ -59,7 +59,7 @@ has notify => (
   isa      => sub {
     confess "'notify' should be 1 or 0" unless ($_[0] =~ /^[01]$/);
   },
-  required => true
+  required => TRUE
 );
 
 has created_at => (

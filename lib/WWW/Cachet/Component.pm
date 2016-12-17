@@ -1,7 +1,7 @@
 package WWW::Cachet::Component;
 
-use constant true  => 1;
-use constant false => 0;
+use constant TRUE  => 1;
+use constant FALSE => 0;
 
 use Moo;
 extends 'WWW::Cachet::Object';
@@ -16,7 +16,7 @@ has id => (
 
 has name => (
   is       => 'rw',
-  required => true
+  required => TRUE
 );
 
 has description => (
@@ -28,7 +28,7 @@ has status => (
   isa      => sub {
     confess "Invalid component status" unless ($_[0] =~ /^[1-4]$/); 
   },
-  required => true
+  required => TRUE
 );
 
 has link => (
