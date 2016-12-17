@@ -3,11 +3,11 @@ use warnings;
 
 use Test::LWP::UserAgent;
 use Test::More tests => 20;
-use WWW::Cachet::Status qw/ :component_status /;
+use WWW::Cachet::Const qw/ :component_status /;
 BEGIN { 
   use_ok('WWW::Cachet');
   use_ok('WWW::Cachet::Component');  
-  use_ok('WWW::Cachet::Status');  
+  use_ok('WWW::Cachet::Const');  
 };
 
 #########################
