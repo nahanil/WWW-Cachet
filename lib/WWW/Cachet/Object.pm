@@ -22,7 +22,14 @@ sub fromJSON {
 __END__
 =head1 NAME
 
-WWW::Cachet::Component - Base class for API objects
+WWW::Cachet::Object - Base class for API objects
+
+=head1 SEE ALSO
+
+L<WWW::Cachet>, L<WWW::Cachet::Component>, L<WWW::Cachet::Incident>,
+L<WWW::Cachet::ComponentGroup>, L<WWW::Cachet::Metric>, L<WWW::Cachet::Subscriber>,
+L<WWW::Cachet::Action>
+
 
 =head1 AUTHOR
 
