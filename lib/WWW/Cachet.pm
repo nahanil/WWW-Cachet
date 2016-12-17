@@ -55,6 +55,10 @@ has api_token => (
   required => TRUE,
 );
 
+has _ua => (
+  is => 'rw'
+);
+
 =head2 General
 
 =head3 error()
@@ -69,8 +73,8 @@ has error => (
 sub BUILD {
   my ($self, $args) = @_;
 
-  $self->{ua} = new LWP::UserAgent;
-  $self->{ua}->default_header("X-Cachet-Token" => $self->api_token);
+  $self->_ua( defined $args->{_ua} ? $args->{_ua} : new LWP::UserAgent);
+  $self->_ua->default_header("X-Cachet-Token" => $self->api_token);
 }
 
 =head3 ping()
@@ -297,28 +301,28 @@ sub deleteIncident {
 sub _get {
   my ($self, $path) = @_;
   my $url = $self->api_url . $path;
-  my $res =$self->{ua}->request(GET $url);
+  my $res =$self->_ua->request(GET $url);
   return $self->_handle_response($res);
 }
 
 sub _post {
   my ($self, $path, $params) = @_;
   my $url = $self->api_url . $path;
-  my $res = $self->{ua}->request(POST $url, $params);
+  my $res = $self->_ua->request(POST $url, $params);
   return $self->_handle_response($res);
 }
 
 sub _put {
   my ($self, $path, $params) = @_;
   my $url = $self->api_url . $path;
-  my $res = $self->{ua}->request(PUT $url, $params);
+  my $res = $self->_ua->request(PUT $url, $params);
   return $self->_handle_response($res);
 }
 
 sub _delete {
   my ($self, $path) = @_;
   my $url = $self->api_url . $path;
-  my $res =$self->{ua}->request(DELETE $url);
+  my $res =$self->_ua->request(DELETE $url);
   return $self->_handle_response($res);
 }
 
