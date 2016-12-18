@@ -7,7 +7,6 @@ WWW::Cachet - Perl extension to interface with Cachet L<http://cachethq.io/>
 
 =head1 SYNOPSIS
 
-  use Data::Dumper;
   use WWW::Cachet;
   # Import some constants to use later
   use WWW::Cachet::Const qw/ :all :component_status :incident_status :calc_type /;
@@ -22,7 +21,15 @@ WWW::Cachet - Perl extension to interface with Cachet L<http://cachethq.io/>
     }
   );
 
-  # List Components
+  # Retrieve all components
+  my $components = $cachet->getComponents();
+  print $_->name, "\n" for (@{$components});
+
+  # Retrieve all components with status STATUS_MAJOR_OUTAGE
+  my $components = $cachet->getComponents({ status => STATUS_MAJOR_OUTAGE });
+  print $_->name, "\n" for (@{$components});
+
+  # Retrieve a single component
   my $component = $cachet->getComponent(1);
   die $cachet->error unless($component);
 
@@ -57,6 +64,7 @@ use constant FALSE => 0;
 use Moo;
 use Carp;
 use JSON;
+use URI;
 use LWP::UserAgent;
 use HTTP::Request::Common qw/ GET POST PUT DELETE /;
 
@@ -139,15 +147,14 @@ sub getVersion {
 
 =head2 Components
 
-=head3 getComponents()
+=head3 getComponents(\%params)
 
   Returns a list of WWW::Cachet::Component from the Cachet API
 
 =cut
 sub getComponents {
-  my ($self, $id) = @_;
-  
-  my $response = $self->_get("/components");
+  my ($self, $params) = @_;
+  my $response = $self->_get("/components", $params);
   if ($response->ok) {
     my @components = ();
     for my $c (@{$response->data}) {
@@ -236,15 +243,15 @@ sub deleteComponent {
 
 =head2 Component Groups
 
-=head3 getComponentGroups()
+=head3 getComponentGroups(\%params)
 
   Returns a list of WWW::Cachet::ComponentGroup from the Cachet API
 
 =cut
 sub getComponentGroups {
-  my ($self, $id) = @_;
+  my ($self, $params) = @_;
   
-  my $response = $self->_get("/components/groups");
+  my $response = $self->_get("/components/groups", $params);
   if ($response->ok) {
     my @groups = ();
     for my $c (@{$response->data}) {
@@ -333,15 +340,15 @@ sub deleteComponentGroup {
 
 =head2 Incidents
 
-=head3 getIncidents()
+=head3 getIncidents(\%params)
 
   Returns a list of WWW::Cachet::Incident from the Cachet API
 
 =cut
 sub getIncidents {
-  my ($self, $id) = @_;
+  my ($self, $params) = @_;
   
-  my $response = $self->_get("/incidents");
+  my $response = $self->_get("/incidents", $params);
   if ($response->ok) {
     my @incidents = ();
     for my $c (@{$response->data}) {
@@ -439,7 +446,7 @@ sub deleteIncident {
 
 =cut
 sub getMetrics {
-  my ($self, $id) = @_;
+  my ($self) = @_;
   
   my $response = $self->_get("/metrics");
   if ($response->ok) {
@@ -680,9 +687,12 @@ sub deleteSubscriber {
 #
 ##
 sub _get {
-  my ($self, $path) = @_;
-  my $url = $self->api_url . $path;
-  my $request = GET $url;
+  my ($self, $path, $params) = @_;
+  # Build a uri with get params if they were passed in
+  my $uri = URI->new( $self->api_url . $path );
+  $uri->query_form($params) if ($params);
+  # Be a man, do the food
+  my $request = GET $uri;
   return $self->_handle_response($request);
 }
 
@@ -707,6 +717,8 @@ sub _delete {
   return $self->_handle_response($request);
 }
 
+# Handles the response, yes, but also actually does the HTTP request to API
+# Name could do with a bit more thought.
 sub _handle_response {
   my ($self, $req) = @_;
 
@@ -765,9 +777,24 @@ __END__
 
 - API Calls that need to be implemented
 
-  /subscribers.*
   /incidents/:incident/updates.*
   /actions.*
+
+- POD/documentation could do with a bit of love - hopefully for now it's enough to get you going
+
+- More/better tests
+
+=head1 BUGS
+
+addSubscriber
+  Setting the 'components' key in the request doesn't actually work.
+  Probably need to rework the POST request code to send a JSON body rather than form encoded vars.
+
+If you find any more bugs/issues/etc email me at the address below. Alternatively you can submit a
+pull request or open an issue at https://github.com/texh/WWW-Cachet
+
+Viva la open sauce
+
 
 =head1 AUTHOR
 

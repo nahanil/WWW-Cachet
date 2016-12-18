@@ -7,6 +7,7 @@ WriteMakefile(
     VERSION_FROM      => 'lib/WWW/Cachet.pm', # finds $VERSION, requires EU::MM from perl >= 5.5
     PREREQ_PM         => {
       'Moo' => '2.003000',
+      'URI' => 0,
       'LWP::UserAgent' => '0',
       'LWP::Protocol::https' => '0',
       'JSON' => '0',
