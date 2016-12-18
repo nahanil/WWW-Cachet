@@ -16,6 +16,8 @@ To install this module type the following:
 I've tried for the most part to document public methods in the WWW::Cachet module using POD.
 Check ```perldoc WWW::Cachet``` once installed, or ```perldoc lib/WWW/Cachet.pm``` from this directory.
 
+It may also be advantageous for you to take a look at the [Cachet API Documentation](https://docs.cachethq.io/reference).
+
 ## EXAMPLE
 
 Okay so you don't wanna read the perldoc for whatever reason then that's fine too, here's a starter for
