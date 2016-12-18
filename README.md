@@ -11,18 +11,6 @@ To install this module type the following:
     make test
     make install
 
-## DEPENDENCIES
-
-This module requires these other modules and libraries:
-
-  - Moo
-  - LWP::UserAgent
-  - LWP::Protocol::https (If your cachet uses SSL)
-  - JSON
-
-In order to run the tests in t/ you will need
-  - Test::LWP::UserAgent
-
 ## DOCUMENTATATION
 
 I've tried for the most part to document public methods in the WWW::Cachet module using POD.
@@ -34,7 +22,6 @@ Okay so you don't wanna read the perldoc for whatever reason then that's fine to
 ya. Godspeed.
 
 ```perl
-use Data::Dumper;
 use WWW::Cachet;
 # Import some constants to use later
 use WWW::Cachet::Const qw/ :all :component_status :incident_status :calc_type /;
@@ -49,14 +36,22 @@ my $cachet = WWW::Cachet->new(
   }
 );
 
-# List Components
+# Retrieve all components
+my $components = $cachet->getComponents();
+print $_->name, "\n" for (@{$components});
+
+# Retrieve all components with status STATUS_MAJOR_OUTAGE
+my $components = $cachet->getComponents({ status => STATUS_MAJOR_OUTAGE });
+print $_->name, "\n" for (@{$components});
+
+# Retrieve a single component
 my $component = $cachet->getComponent(1);
 die $cachet->error unless($component);
 
 # Create a component
 my $new_component = $cachet->addComponent({
-    name => "New Component",
-    status => STATUS_OPERATIONAL
+  name => "New Component",
+  status => STATUS_OPERATIONAL
 });
 
 # Update an existing component
@@ -68,10 +63,17 @@ my %update = ( status => STATUS_PARTIAL_OUTAGE );
 my $updated_component = $cachet->updateComponent($id, \%update);
 ```
 
+## DEPENDENCIES
+
+This module requires other modules and libraries:
+  - The sole source of truth lies within Makefile.PL
+
 ## COPYRIGHT AND LICENCE
 
-Copyright (C) 2016 by Jarrod Linahan <jarrod@linahan.id.au>
+Copyright 2016 Jarrod Linahan <jarrod@linahan.id.au>
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.20.2 or,
 at your option, any later version of Perl 5 you may have available.
+
+##### Viva la open sauce
