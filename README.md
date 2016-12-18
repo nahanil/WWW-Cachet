@@ -1,4 +1,4 @@
-# WWW-Cachet version 0.01
+# WWW::Cachet
 
 A simple (enough) Perl module to interface with Cachet (https://docs.cachethq.io)
 
