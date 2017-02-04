@@ -32,7 +32,14 @@ has components => (
   is => 'rw',
 );
 
-has verified_code => (
+has global => (
+  is => 'rw',
+  coerce => sub {
+    return (!$_[0] || $_[0] eq 'false' ? JSON::false : JSON::true);
+  },
+);
+
+has verify_code => (
   is  =>'rw', 
 );
 
@@ -46,6 +53,16 @@ has created_at => (
 
 has updated_at => (
   is => 'rw'
+);
+
+has subscriptions => (
+  is => 'rw',
+  isa => sub {
+    if ($_) {
+      confess "Expected 'subscriptions' to be an array" unless (ref $_[0] eq "ARRAY");
+    }
+  },
+  default => sub { undef }
 );
 
 1;
