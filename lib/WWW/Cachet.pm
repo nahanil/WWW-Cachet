@@ -67,6 +67,7 @@ use JSON;
 use URI;
 use LWP::UserAgent;
 use HTTP::Request::Common qw/ GET POST PUT DELETE /;
+use HTTP::Status qw/ status_message /;
 
 use WWW::Cachet::Response;
 use WWW::Cachet::Component;
@@ -744,21 +745,6 @@ sub _handle_response {
       data => $json ? $json->{data} : undef
     );
 
-  } elsif ($res->code == 400) {
-    # Gather error message(s)
-    my @errors = ();
-    if ($res->content) {
-      my $json = decode_json $res->content;
-      for my $e (@{ $json->{errors} }) {
-        for my $detail (@{ $e->{meta}->{details} }) {
-          push @errors, $detail;
-        }
-      }
-    } else { push @errors, "Bad Request"; }
-    
-    $self->error( join("; ", @errors) );
-    $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
-
   } elsif ($res->code == 401) {
     $self->error("API Authentication is required and has failed");
     $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
@@ -768,7 +754,18 @@ sub _handle_response {
     $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
 
   } else {
-    $self->error("Request failed: ". $res->content);
+    # Gather error message(s)
+    my @errors = ();
+    if ($res->content) {
+      my $json = decode_json $res->content;
+      for my $e (@{ $json->{errors} }) {
+        push @errors, "$e->{title}: $e->{detail}";
+      }
+    } else {
+      push @errors, status_message($res->code);
+    }
+
+    $self->error( join("; ", @errors) );
     $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
   }
 
