@@ -4,6 +4,7 @@ use constant TRUE  => 1;
 use constant FALSE => 0;
 
 use Moo;
+use JSON;
 extends 'WWW::Cachet::Object';
 use Carp qw/ confess /;
 
@@ -11,6 +12,7 @@ has id => (
   is  => 'rw',
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
@@ -28,6 +30,7 @@ has status => (
   is       => 'rw',
   isa      => sub {
     confess "Invalid incident status" unless ($_[0] =~ /^[0-4]$/); 
+    $_[0] += 0;
   },
   required => TRUE
 );
@@ -36,6 +39,7 @@ has visible => (
   is       => 'rw',
   isa      => sub {
     confess "'visible' should be 1 or 0" unless ($_[0] =~ /^[01]$/);
+    $_[0] += 0;
   },
   required => TRUE
 );
@@ -44,22 +48,24 @@ has component_id => (
   is  => 'rw',
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
 has component_status => (
   is       => 'rw',
   isa      => sub {
-    confess "Invalid incident status" unless ($_[0] =~ /^[1-4]$/);
+    confess "Invalid incident component status" unless ($_[0] =~ /^[1-4]$/);
+    $_[0] += 0;
   },
 );
 
 has notify => (
   is       => 'rw',
-  isa      => sub {
-    confess "'notify' should be 1 or 0" unless ($_[0] =~ /^[01]$/);
+  coerce   => sub {
+    return (!$_[0] || $_[0] eq 'false' ? JSON::false : JSON::true);
   },
-  default  => sub { 0 }
+  default  => sub { JSON::false }
 );
 
 has template => (

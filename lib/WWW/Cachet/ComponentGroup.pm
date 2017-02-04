@@ -11,6 +11,7 @@ has id => (
   is  => 'rw',
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
@@ -24,13 +25,15 @@ has order  => (
   is  =>'rw', 
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
 has collapsed => (
   is       => 'rw',
   isa      => sub {
-    confess "'collapsed' should be 1 or 0" unless ($_[0] =~ /^[012]$/);
+    confess "'collapsed' should be 0, 1 or 2" unless ($_[0] =~ /^[012]$/);
+    $_[0] += 0;
   },
   default  => sub { 0 }
 );

@@ -4,6 +4,7 @@ use constant TRUE  => 1;
 use constant FALSE => 0;
 
 use Moo;
+use JSON;
 extends 'WWW::Cachet::Object';
 use Carp qw/ confess /;
 
@@ -11,6 +12,7 @@ has id => (
   is  => 'rw',
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
@@ -21,6 +23,9 @@ has email => (
 
 has verify => (
   is => 'rw',
+  coerce => sub {
+    return (!$_[0] || $_[0] eq 'false' ? JSON::false : JSON::true);
+  },
 );
 
 has components => (

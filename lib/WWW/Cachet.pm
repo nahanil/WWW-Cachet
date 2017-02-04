@@ -722,14 +722,14 @@ sub _get {
 sub _post {
   my ($self, $path, $params) = @_;
   my $url = $self->api_url . $path;
-  my $request = POST $url, $params;
+  my $request = POST $url, 'Content-Type' => 'application/json', Content => encode_json($params);
   return $self->_handle_response($request);
 }
 
 sub _put {
   my ($self, $path, $params) = @_;
   my $url = $self->api_url . $path;
-  my $request = PUT $url, $params;
+  my $request = PUT $url, 'Content-Type' => 'application/json', Content => encode_json($params);
   return $self->_handle_response($request);
 }
 

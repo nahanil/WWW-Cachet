@@ -11,6 +11,7 @@ has id => (
   is  => 'rw',
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
@@ -18,6 +19,7 @@ has metric_id  => (
   is  =>'rw', 
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
@@ -30,6 +32,7 @@ has timestamp  => (
   is       => 'rw',
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
