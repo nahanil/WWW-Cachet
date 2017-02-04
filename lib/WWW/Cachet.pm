@@ -198,6 +198,9 @@ sub addComponent {
     $component = $component->toHash();
   }
 
+  # Including a tags key in the request will cause a 500 Internal Server Error
+  delete($component->{tags});
+
   my $response = $self->_post("/components", $component);
   if ($response->ok) {
     return WWW::Cachet::Component->new($response->data);
@@ -223,6 +226,9 @@ sub updateComponent {
   if (ref $component eq "WWW::Cachet::Component") {
     $component = $component->toHash();
   }
+
+  # Including a tags key in the request will cause a 500 Internal Server Error
+  delete($component->{tags});
 
   my $response = $self->_put("/components/$id", $component);
   if ($response->ok) {
@@ -392,6 +398,11 @@ sub addIncident {
     $incident = $incident->toHash();
   }
 
+  # We receive a 400 Bad Request if a component_id is set without a
+  # component_status
+  delete($incident->{component_id})
+    unless (exists($incident->{component_status}));
+
   my $response = $self->_post("/incidents", $incident);
   if ($response->ok) {
     return WWW::Cachet::Incident->new($response->data);
@@ -407,7 +418,7 @@ sub addIncident {
 
 =cut
 sub updateIncident {
-   my ($self, $id, $incident) = @_;
+  my ($self, $id, $incident) = @_;
 
   if (ref $id eq "WWW::Cachet::Incident" && $id->id) {
     $incident = $id;
@@ -416,9 +427,16 @@ sub updateIncident {
 
   if (ref $incident eq "WWW::Cachet::Incident") {
     $incident = $incident->toHash();
-    undef $incident->{created_at};
-    undef $incident->{id};
   }
+
+  # Including a created_at key in the request will cause a 500 Internal Server
+  # Error
+  delete($incident->{created_at});
+
+  # We receive a 400 Bad Request if a component_id is set without a
+  # component_status
+  delete($incident->{component_id})
+    unless (exists($incident->{component_status}));
 
   my $response = $self->_put("/incidents/$id", $incident);
   if ($response->ok) {
