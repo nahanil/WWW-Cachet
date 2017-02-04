@@ -70,7 +70,11 @@ use HTTP::Request::Common qw/ GET POST PUT DELETE /;
 
 use WWW::Cachet::Response;
 use WWW::Cachet::Component;
+use WWW::Cachet::ComponentGroup;
 use WWW::Cachet::Incident;
+use WWW::Cachet::Metric;
+use WWW::Cachet::MetricPoint;
+use WWW::Cachet::Subscriber;
 
 has api_url => (
   is => 'rw',
