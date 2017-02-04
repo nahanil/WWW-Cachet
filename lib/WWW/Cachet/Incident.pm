@@ -59,7 +59,7 @@ has notify => (
   isa      => sub {
     confess "'notify' should be 1 or 0" unless ($_[0] =~ /^[01]$/);
   },
-  default  => 0
+  default  => sub { 0 }
 );
 
 has template => (

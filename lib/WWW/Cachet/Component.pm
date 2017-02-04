@@ -42,7 +42,7 @@ has tags => (
       confess "Expected 'tags' to be an array" unless (ref $_[0]  eq "HASH");
     }
   },
-  default => undef
+  default => sub { undef }
 );
 
 has link => (

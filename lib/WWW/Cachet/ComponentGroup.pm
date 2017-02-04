@@ -32,7 +32,7 @@ has collapsed => (
   isa      => sub {
     confess "'collapsed' should be 1 or 0" unless ($_[0] =~ /^[012]$/);
   },
-  default  => 0
+  default  => sub { 0 }
 );
 
 has created_at => (
