@@ -113,7 +113,7 @@ Jarrod Linahan, E<lt>jarrod@linahan.id.au<gt>
 Copyright (C) 2016 by Jarrod Linahan
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.20.2 or,
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
