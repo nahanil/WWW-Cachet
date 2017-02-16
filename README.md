@@ -69,6 +69,10 @@ my $updated_component = $cachet->updateComponent($id, \%update);
 
 This module requires other modules and libraries:
   - The sole source of truth lies within Makefile.PL
+  
+## CONTRIBUTORS
+* **[Peter Kjellerstedt](https://github.com/Saur2000)**
+* **[Jarrod Linahan](https://github.com/texh)**
 
 ## COPYRIGHT AND LICENCE
 
