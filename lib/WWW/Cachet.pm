@@ -67,10 +67,15 @@ use JSON;
 use URI;
 use LWP::UserAgent;
 use HTTP::Request::Common qw/ GET POST PUT DELETE /;
+use HTTP::Status qw/ status_message /;
 
 use WWW::Cachet::Response;
 use WWW::Cachet::Component;
+use WWW::Cachet::ComponentGroup;
 use WWW::Cachet::Incident;
+use WWW::Cachet::Metric;
+use WWW::Cachet::MetricPoint;
+use WWW::Cachet::Subscriber;
 
 has api_url => (
   is => 'rw',
@@ -193,6 +198,9 @@ sub addComponent {
     $component = $component->toHash();
   }
 
+  # Including a tags key in the request will cause a 500 Internal Server Error
+  delete($component->{tags});
+
   my $response = $self->_post("/components", $component);
   if ($response->ok) {
     return WWW::Cachet::Component->new($response->data);
@@ -218,6 +226,9 @@ sub updateComponent {
   if (ref $component eq "WWW::Cachet::Component") {
     $component = $component->toHash();
   }
+
+  # Including a tags key in the request will cause a 500 Internal Server Error
+  delete($component->{tags});
 
   my $response = $self->_put("/components/$id", $component);
   if ($response->ok) {
@@ -387,6 +398,11 @@ sub addIncident {
     $incident = $incident->toHash();
   }
 
+  # We receive a 400 Bad Request if a component_id is set without a
+  # component_status
+  delete($incident->{component_id})
+    unless (exists($incident->{component_status}));
+
   my $response = $self->_post("/incidents", $incident);
   if ($response->ok) {
     return WWW::Cachet::Incident->new($response->data);
@@ -402,7 +418,7 @@ sub addIncident {
 
 =cut
 sub updateIncident {
-   my ($self, $id, $incident) = @_;
+  my ($self, $id, $incident) = @_;
 
   if (ref $id eq "WWW::Cachet::Incident" && $id->id) {
     $incident = $id;
@@ -411,9 +427,16 @@ sub updateIncident {
 
   if (ref $incident eq "WWW::Cachet::Incident") {
     $incident = $incident->toHash();
-    undef $incident->{created_at};
-    undef $incident->{id};
   }
+
+  # Including a created_at key in the request will cause a 500 Internal Server
+  # Error
+  delete($incident->{created_at});
+
+  # We receive a 400 Bad Request if a component_id is set without a
+  # component_status
+  delete($incident->{component_id})
+    unless (exists($incident->{component_status}));
 
   my $response = $self->_put("/incidents/$id", $incident);
   if ($response->ok) {
@@ -699,14 +722,14 @@ sub _get {
 sub _post {
   my ($self, $path, $params) = @_;
   my $url = $self->api_url . $path;
-  my $request = POST $url, $params;
+  my $request = POST $url, 'Content-Type' => 'application/json', Content => encode_json($params);
   return $self->_handle_response($request);
 }
 
 sub _put {
   my ($self, $path, $params) = @_;
   my $url = $self->api_url . $path;
-  my $request = PUT $url, $params;
+  my $request = PUT $url, 'Content-Type' => 'application/json', Content => encode_json($params);
   return $self->_handle_response($request);
 }
 
@@ -740,21 +763,6 @@ sub _handle_response {
       data => $json ? $json->{data} : undef
     );
 
-  } elsif ($res->code == 400) {
-    # Gather error message(s)
-    my @errors = ();
-    if ($res->content) {
-      my $json = decode_json $res->content;
-      for my $e (@{ $json->{errors} }) {
-        for my $detail (@{ $e->{meta}->{details} }) {
-          push @errors, $detail;
-        }
-      }
-    } else { push @errors, "Bad Request"; }
-    
-    $self->error( join("; ", @errors) );
-    $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
-
   } elsif ($res->code == 401) {
     $self->error("API Authentication is required and has failed");
     $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
@@ -764,7 +772,18 @@ sub _handle_response {
     $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
 
   } else {
-    $self->error("Request failed: ". $res->content);
+    # Gather error message(s)
+    my @errors = ();
+    if ($res->content) {
+      my $json = decode_json $res->content;
+      for my $e (@{ $json->{errors} }) {
+        push @errors, "$e->{title}: $e->{detail}";
+      }
+    } else {
+      push @errors, status_message($res->code);
+    }
+
+    $self->error( join("; ", @errors) );
     $response = WWW::Cachet::Response->new( ok => FALSE, message => $self->error );
   }
 
@@ -805,7 +824,7 @@ Jarrod Linahan <jarrod@linahan.id.au>
 Copyright (C) 2016 by Jarrod Linahan
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.20.2 or,
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut

@@ -11,6 +11,7 @@ has id => (
   is  => 'rw',
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
@@ -18,6 +19,7 @@ has metric_id  => (
   is  =>'rw', 
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
@@ -30,6 +32,7 @@ has timestamp  => (
   is       => 'rw',
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
@@ -64,7 +67,7 @@ Jarrod Linahan <jarrod@linahan.id.au>
 Copyright (C) 2016 by Jarrod Linahan
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.20.2 or,
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut

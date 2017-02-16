@@ -4,6 +4,7 @@ use constant TRUE  => 1;
 use constant FALSE => 0;
 
 use Moo;
+use JSON;
 extends 'WWW::Cachet::Object';
 use Carp qw/ confess /;
 
@@ -11,6 +12,7 @@ has id => (
   is  => 'rw',
   isa => sub {
     confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
   }
 );
 
@@ -30,7 +32,11 @@ has description => (
 );
 
 has default_value => (
-  is  =>'rw', 
+  is  =>'rw',
+  isa => sub {
+    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
+    $_[0] += 0;
+  },
   required => TRUE
 );
 
@@ -38,13 +44,14 @@ has calc_type => (
   is => 'rw',
   isa      => sub {
     confess "'calc_type' should be CALC_TYPE_AVERAGE (1) or or CALC_TYPE_SUM (0)" unless ($_[0] =~ /^[01]$/);
+    $_[0] += 0;
   },
 );
 
 has display_chart => (
   is       => 'rw',
-  isa      => sub {
-    confess "'display_chart' should be 1 or 0" unless ($_[0] =~ /^[01]$/);
+  coerce   => sub {
+    return (!$_[0] || $_[0] eq 'false' ? JSON::false : JSON::true);
   },
 );
 
@@ -83,7 +90,7 @@ Jarrod Linahan <jarrod@linahan.id.au>
 Copyright (C) 2016 by Jarrod Linahan
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.20.2 or,
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
 at your option, any later version of Perl 5 you may have available.
 
 =cut
