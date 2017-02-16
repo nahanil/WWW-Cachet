@@ -1,5 +1,6 @@
-WWW::Cachet contributors (sorted alphabetically)
+WWW::Cachet contributors
 ============================================
+(sorted alphabetically by surname)
 
 * **[Peter Kjellerstedt](https://github.com/Saur2000)**
 
