@@ -8,10 +8,10 @@ extends 'WWW::Cachet::Object';
 use Carp qw/ confess /;
 
 has id => (
-  is  => 'rw',
-  isa => sub {
-    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
-    $_[0] += 0;
+  is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
+  isa      => sub {
+    confess "'$_[0]' is not an integer!" if ((my $var = $_[0]) !~ /^\d+$/);
   }
 );
 
@@ -21,19 +21,19 @@ has name => (
 );
 
 
-has order  => (
-  is  =>'rw', 
-  isa => sub {
-    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
-    $_[0] += 0;
+has order => (
+  is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
+  isa      => sub {
+    confess "'$_[0]' is not an integer!" if ((my $var = $_[0]) !~ /^\d+$/);
   }
 );
 
 has collapsed => (
   is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
   isa      => sub {
-    confess "'collapsed' should be 0, 1 or 2" unless ($_[0] =~ /^[012]$/);
-    $_[0] += 0;
+    confess "'collapsed' should be 0, 1 or 2" unless ((my $var = $_[0]) =~ /^[012]$/);
   },
   default  => sub { 0 }
 );

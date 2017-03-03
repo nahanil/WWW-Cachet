@@ -9,10 +9,10 @@ extends 'WWW::Cachet::Object';
 use Carp qw/ confess /;
 
 has id => (
-  is  => 'rw',
-  isa => sub {
-    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
-    $_[0] += 0;
+  is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
+  isa      => sub {
+    confess "'$_[0]' is not an integer!" if ((my $var = $_[0]) !~ /^\d+$/);
   }
 );
 
@@ -27,9 +27,9 @@ has description => (
 
 has status => (
   is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
   isa      => sub {
-    confess "Invalid component status" unless ($_[0] =~ /^[1-4]$/); 
-    $_[0] += 0;
+    confess "Invalid component status" unless ((my $var = $_[0]) =~ /^[1-4]$/);
   },
   required => TRUE
 );
@@ -39,13 +39,13 @@ has status_name => (
 );
 
 has tags => (
-  is => 'rw',
-  isa => sub {
+  is       => 'rw',
+  isa      => sub {
     if ($_) {
       confess "Expected 'tags' to be a hash" unless (ref $_[0] eq "HASH");
     }
   },
-  default => sub { undef }
+  default  => sub { undef }
 );
 
 has link => (
@@ -58,9 +58,9 @@ has order => (
 
 has group_id => (
   is       => 'rw',
-  isa => sub {
-    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
-    $_[0] += 0;
+  coerce   => sub { $_[0] + 0 },
+  isa      => sub {
+    confess "'$_[0]' is not an integer!" if ((my $var = $_[0]) !~ /^\d+$/);
   }
 );
 

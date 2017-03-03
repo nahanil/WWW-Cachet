@@ -8,18 +8,18 @@ extends 'WWW::Cachet::Object';
 use Carp qw/ confess /;
 
 has id => (
-  is  => 'rw',
-  isa => sub {
-    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
-    $_[0] += 0;
+  is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
+  isa      => sub {
+    confess "'$_[0]' is not an integer!" if ((my $var = $_[0]) !~ /^\d+$/);
   }
 );
 
 has metric_id  => (
-  is  =>'rw', 
-  isa => sub {
-    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
-    $_[0] += 0;
+  is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
+  isa      => sub {
+    confess "'$_[0]' is not an integer!" if ((my $var = $_[0]) !~ /^\d+$/);
   }
 );
 
@@ -30,9 +30,9 @@ has value => (
 
 has timestamp  => (
   is       => 'rw',
-  isa => sub {
-    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
-    $_[0] += 0;
+  coerce   => sub { $_[0] + 0 },
+  isa      => sub {
+    confess "'$_[0]' is not an integer!" if ((my $var = $_[0]) !~ /^\d+$/);
   }
 );
 
