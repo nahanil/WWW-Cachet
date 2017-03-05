@@ -9,10 +9,10 @@ extends 'WWW::Cachet::Object';
 use Carp qw/ confess /;
 
 has id => (
-  is  => 'rw',
-  isa => sub {
-    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
-    $_[0] += 0;
+  is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
+  isa      => sub {
+    confess "'$_[0]' is not an integer!" if ((my $var = $_[0]) !~ /^\d+$/);
   }
 );
 
@@ -32,19 +32,19 @@ has description => (
 );
 
 has default_value => (
-  is  =>'rw',
-  isa => sub {
-    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
-    $_[0] += 0;
+  is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
+  isa      => sub {
+    confess "'$_[0]' is not an integer!" if ((my $var = $_[0]) !~ /^\d+$/);
   },
   required => TRUE
 );
 
 has calc_type => (
-  is => 'rw',
+  is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
   isa      => sub {
-    confess "'calc_type' should be CALC_TYPE_AVERAGE (1) or or CALC_TYPE_SUM (0)" unless ($_[0] =~ /^[01]$/);
-    $_[0] += 0;
+    confess "'calc_type' should be CALC_TYPE_AVERAGE (1) or or CALC_TYPE_SUM (0)" unless ((my $var = $_[0]) =~ /^[01]$/);
   },
 );
 

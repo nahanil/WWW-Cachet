@@ -9,21 +9,21 @@ extends 'WWW::Cachet::Object';
 use Carp qw/ confess /;
 
 has id => (
-  is  => 'rw',
-  isa => sub {
-    confess "'$_[0]' is not an integer!" if $_[0] !~ /^\d+$/;
-    $_[0] += 0;
+  is       => 'rw',
+  coerce   => sub { $_[0] + 0 },
+  isa      => sub {
+    confess "'$_[0]' is not an integer!" if ((my $var = $_[0]) !~ /^\d+$/);
   }
 );
 
 has email => (
-  is       =>'rw', 
+  is       => 'rw',
   required => TRUE
 );
 
 has verify => (
-  is => 'rw',
-  coerce => sub {
+  is       => 'rw',
+  coerce   => sub {
     return (!$_[0] || $_[0] eq 'false' ? JSON::false : JSON::true);
   },
 );
@@ -33,18 +33,18 @@ has components => (
 );
 
 has global => (
-  is => 'rw',
-  coerce => sub {
+  is       => 'rw',
+  coerce   => sub {
     return (!$_[0] || $_[0] eq 'false' ? JSON::false : JSON::true);
   },
 );
 
 has verify_code => (
-  is  =>'rw', 
+  is  => 'rw',
 );
 
 has verified_at => (
-  is  =>'rw', 
+  is  => 'rw',
 );
 
 has created_at => (
@@ -56,13 +56,13 @@ has updated_at => (
 );
 
 has subscriptions => (
-  is => 'rw',
-  isa => sub {
+  is       => 'rw',
+  isa      => sub {
     if ($_) {
       confess "Expected 'subscriptions' to be an array" unless (ref $_[0] eq "ARRAY");
     }
   },
-  default => sub { undef }
+  default  => sub { undef }
 );
 
 1;
